@@ -16,6 +16,8 @@ type CartState = {
   clear: () => void;
 };
 
+/** Позиция корзины = товар + вариант + получатель (у каждой позиции свои поля). */
+
 /**
  * Хранится в localStorage. skipHydration: на сервере и при первом рендере
  * корзина пуста, а <StoreHydrator /> подтягивает данные после монтирования —
@@ -33,4 +35,5 @@ export const useCartStore = create<CartState>()(
   ),
 );
 
-export const useCartCount = () => useCartStore((s) => s.items.length);
+export const selectCount = (s: CartState) => s.items.length;
+export const useCartCount = () => useCartStore(selectCount);

@@ -1,6 +1,5 @@
+import type { Delivery } from '@/data/products';
 import { cn } from '@/lib/cn';
-
-export type Delivery = 'auto' | 'manual' | 'pending';
 
 const MAP = {
   auto: { cls: 'nx-badge-auto', label: 'Автовыдача' },
