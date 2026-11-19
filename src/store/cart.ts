@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -37,3 +38,11 @@ export const useCartStore = create<CartState>()(
 
 export const selectCount = (s: CartState) => s.items.length;
 export const useCartCount = () => useCartStore(selectCount);
+
+/** true, когда корзина подтянута из localStorage (до этого показываем скелет, а не «пусто»). */
+export const useCartReady = () =>
+  useSyncExternalStore(
+    (cb) => useCartStore.persist.onFinishHydration(cb),
+    () => useCartStore.persist.hasHydrated(),
+    () => false,
+  );

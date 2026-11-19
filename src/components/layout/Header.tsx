@@ -51,7 +51,10 @@ export function Header() {
             data-cart-target
             aria-label={`Корзина, товаров: ${count}`}
           >
-            Корзина · {count}
+            Корзина ·{' '}
+            <span key={count} className="nx-pop inline-block" style={{ animationDelay: '0.7s' }}>
+              {count}
+            </span>
           </Button>
         </div>
       </div>
