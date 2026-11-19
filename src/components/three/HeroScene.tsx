@@ -1,11 +1,11 @@
 'use client';
 
-import { Environment, Lightformer, Stars } from '@react-three/drei';
+import { Environment, Lightformer, PerformanceMonitor, Stars } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useRef } from 'react';
 import { MathUtils, type Group } from 'three';
-import { GlassCard, type Quality } from './GlassCard';
+import { GlassCard, type SceneQuality } from './GlassCard';
 import { SynthGrid } from './SynthGrid';
 
 export type SceneCard = { slug: string; name: string; priceText: string; glow: string };
@@ -40,7 +40,7 @@ function Rig({
 }: {
   cards: SceneCard[];
   compact: boolean;
-  quality: Quality;
+  quality: SceneQuality;
   tilt: React.RefObject<Tilt>;
   onSelect: (slug: string) => void;
 }) {
@@ -98,14 +98,17 @@ export default function HeroScene({
   active,
   tilt,
   onReady,
+  onDecline,
   onSelect,
 }: {
   cards: SceneCard[];
   compact: boolean;
-  quality: Quality;
+  quality: SceneQuality;
   active: boolean;
   tilt: React.RefObject<Tilt>;
   onReady: () => void;
+  /** FPS просел — просим понизить уровень качества */
+  onDecline: () => void;
   onSelect: (slug: string) => void;
 }) {
   const high = quality === 'high';
@@ -116,7 +119,7 @@ export default function HeroScene({
       dpr={high ? [1, 1.75] : [1, 1.25]}
       frameloop={active ? 'always' : 'demand'}
       camera={{ position: [0, 0.6, 8.2], fov: 40 }}
-      gl={{ alpha: true, antialias: !high, powerPreference: 'high-performance' }}
+      gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
       onCreated={({ camera }) => camera.lookAt(0, -0.2, 0)}
       aria-hidden
     >
@@ -128,7 +131,7 @@ export default function HeroScene({
       <pointLight position={[4, -1, 4]} intensity={16} color="#3b82f6" />
 
       {/* процедурное окружение (без загрузки HDR) — даёт стеклу блики */}
-      <Environment resolution={256} frames={1}>
+      <Environment resolution={128} frames={1}>
         <Lightformer
           form="rect"
           intensity={3}
@@ -149,7 +152,7 @@ export default function HeroScene({
       <Stars
         radius={45}
         depth={40}
-        count={high ? 3000 : 1200}
+        count={high ? 2000 : 900}
         factor={3}
         saturation={0.4}
         fade
@@ -159,11 +162,12 @@ export default function HeroScene({
       <Rig cards={cards} compact={compact} quality={quality} tilt={tilt} onSelect={onSelect} />
 
       {high && (
-        <EffectComposer multisampling={4} enableNormalPass={false}>
+        <EffectComposer multisampling={0} enableNormalPass={false}>
           <Bloom intensity={0.9} luminanceThreshold={0.55} luminanceSmoothing={0.2} mipmapBlur />
         </EffectComposer>
       )}
       <ReadySignal onReady={onReady} />
+      <PerformanceMonitor onDecline={onDecline} />
     </Canvas>
   );
 }

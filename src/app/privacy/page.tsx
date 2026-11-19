@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/legal/LegalPage';
 
-export const metadata: Metadata = { title: 'Политика конфиденциальности' };
+export const metadata: Metadata = {
+  title: 'Политика конфиденциальности',
+  alternates: { canonical: '/privacy' },
+  openGraph: { title: 'Политика конфиденциальности' },
+};
 
 export default function PrivacyPage() {
   return <LegalPage title="Политика конфиденциальности" />;

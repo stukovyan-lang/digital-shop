@@ -27,7 +27,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: site.name, template: `%s · ${site.name}` },
   description: site.description,
-  openGraph: { siteName: site.name, locale: 'ru_RU', type: 'website' },
+  alternates: { canonical: '/' },
+  openGraph: {
+    siteName: site.name,
+    locale: 'ru_RU',
+    type: 'website',
+    title: site.name,
+    description: site.description,
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export const viewport: Viewport = {

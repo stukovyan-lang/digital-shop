@@ -8,6 +8,7 @@ import { LogoTile } from '@/components/ui/LogoTile';
 import { PH } from '@/config/placeholders';
 import { getProduct } from '@/data/products';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { detectQuality, lower, rememberQuality, type Quality } from '@/hooks/useQuality';
 import { cn } from '@/lib/cn';
 
 // R3F-сцена грузится лениво и только на клиенте (SPEC разд. 6)
@@ -98,23 +99,44 @@ export function HeroStage() {
   const orbit = useRef<HTMLDivElement>(null);
   const tilt = useRef({ x: 0, y: 0 });
   const compact = useMediaQuery('(max-width: 760px)');
-  const [want3d, setWant3d] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
+  const bornAt = useRef(0);
+  const [quality, setQuality] = useState<Quality | null>(null); // null — ещё не определён
   const [ready, setReady] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [tabVisible, setTabVisible] = useState(true);
 
-  // Грузим сцену после отрисовки первого экрана (в простое), не при reduced-motion
+  // 3D только на high/medium; low = CSS-фолбэк
+  const want3d = quality === 'high' || quality === 'medium';
+  const active = inView && tabVisible; // вне экрана или на скрытой вкладке — frameloop="demand"
+
+  // Определяем уровень и грузим сцену после отрисовки первого экрана (в простое)
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
     };
-    const start = () => setWant3d(true);
-    if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(start, { timeout: 1500 });
-      return () => w.cancelIdleCallback?.(id);
-    }
-    const id = window.setTimeout(start, 800);
-    return () => clearTimeout(id);
+    const start = () => {
+      bornAt.current = performance.now();
+      setQuality(detectQuality());
+    };
+    // Не конкурируем с загрузкой страницы: ждём window.load, затем простой потока
+    let cancelIdle = () => {};
+    const schedule = () => {
+      if (w.requestIdleCallback) {
+        const id = w.requestIdleCallback(start, { timeout: 2500 });
+        cancelIdle = () => w.cancelIdleCallback?.(id);
+      } else {
+        const id = window.setTimeout(start, 1200);
+        cancelIdle = () => clearTimeout(id);
+      }
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+    return () => {
+      window.removeEventListener('load', schedule);
+      cancelIdle();
+    };
   }, []);
 
   // Гироскоп на тач-устройствах: наклон телефона = наклон сцены
@@ -129,6 +151,33 @@ export function HeroStage() {
     window.addEventListener('deviceorientation', onOrient);
     return () => window.removeEventListener('deviceorientation', onOrient);
   }, [want3d]);
+
+  // Пауза: hero вне экрана / вкладка скрыта → canvas не рендерит кадры
+  useEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting));
+    io.observe(el);
+    const onVis = () => setTabVisible(document.visibilityState === 'visible');
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      io.disconnect();
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, []);
+
+  // Просадка FPS → понижаем уровень (high → medium → low). Первые 3 с игнорируем:
+  // компиляция шейдеров даёт ложную просадку.
+  const onDecline = () => {
+    if (performance.now() - bornAt.current < 3000) return;
+    setQuality((q) => {
+      if (!q || q === 'low') return q;
+      const next = lower(q);
+      rememberQuality(next);
+      if (next === 'low') setReady(false);
+      return next;
+    });
+  };
 
   // iOS требует разрешения на датчики — запрашиваем по первому касанию
   const askMotion = () => {
@@ -153,6 +202,7 @@ export function HeroStage() {
   return (
     <div className="nx-stagewrap">
       <div
+        ref={stage}
         className="nx-stage relative h-[430px] w-full sm:h-[540px]"
         onPointerMove={onMove}
         onPointerLeave={onLeave}
@@ -201,7 +251,6 @@ export function HeroStage() {
                     'nx-fcard text-ink no-underline hover:text-white',
                     !('mx' in c) && 'max-[760px]:hidden',
                   )}
-                  aria-label={p.name}
                   style={
                     {
                       '--x': c.x,
@@ -237,12 +286,14 @@ export function HeroStage() {
             aria-hidden
           >
             <HeroScene
+              key={quality}
               cards={sceneCards}
               compact={compact}
-              quality="high"
-              active
+              quality={quality}
+              active={active}
               tilt={tilt}
               onReady={() => setReady(true)}
+              onDecline={onDecline}
               onSelect={(slug) => router.push(`/product/${slug}`)}
             />
           </div>

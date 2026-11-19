@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Group, Texture } from 'three';
 import { makeCardTexture } from './cardTexture';
 
-export type Quality = 'high' | 'medium';
+export type SceneQuality = 'high' | 'medium';
 
 type Props = {
   name: string;
@@ -15,7 +15,7 @@ type Props = {
   position: [number, number, number];
   rotation: [number, number, number];
   floatSpeed: number;
-  quality: Quality;
+  quality: SceneQuality;
   onSelect: () => void;
 };
 
