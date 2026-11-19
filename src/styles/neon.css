@@ -177,9 +177,28 @@
 }
 
 @layer components {
+  /* появление при скролле (SPEC п.4). Скрыто только когда JS жив (html[data-js]) */
+  html[data-js] .nx-reveal:not(.is-in) {
+    opacity: 0;
+    transform: translateY(60px) scale(0.97);
+    filter: blur(6px);
+  }
+  .nx-reveal {
+    transition:
+      opacity 0.8s var(--nx-ease),
+      transform 0.8s var(--nx-ease),
+      filter 0.8s var(--nx-ease);
+  }
+  @media (max-width: 760px) {
+    /* на мобильных blur отключён — тяжёлый для слабых GPU */
+    html[data-js] .nx-reveal:not(.is-in) {
+      filter: none;
+    }
+  }
   /* вход страницы (SPEC п.6): fade + translateY 28px + blur */
   .nx-enter {
-    animation: nx-enter 0.8s var(--nx-ease) both;
+    /* backwards, не both: после конца не оставляем filter/transform на <main> (иначе ломается backdrop-filter у стекла внутри) */
+    animation: nx-enter 0.8s var(--nx-ease) backwards;
   }
   .nx-toast {
     animation: nx-toast 0.3s var(--nx-ease) both;
@@ -500,8 +519,8 @@
   }
   .nx-fcard {
     position: absolute;
-    width: 190px;
-    height: 250px;
+    width: var(--cw);
+    height: var(--ch);
     border-radius: 24px;
     box-sizing: border-box;
     padding: 20px;
@@ -715,8 +734,6 @@
       display: none;
     }
     .nx-fcard {
-      width: 150px;
-      height: 200px;
       padding: 16px;
     }
   }
@@ -744,5 +761,36 @@
   .nx-pre,
   html[data-pre] .nx-pre {
     display: none !important;
+  }
+  html[data-js] .nx-reveal:not(.is-in) {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* размеры карточек CSS-фолбэка зависят от ширины стейджа (container query),
+   поэтому три колонки умещаются и на узком десктопе */
+.nx-stagewrap {
+  container-type: inline-size;
+}
+.nx-stage {
+  --cw: min(190px, 31cqw);
+  --ch: calc(var(--cw) * 1.316);
+}
+@media (max-width: 760px) {
+  .nx-stage {
+    --cw: min(150px, 45cqw);
+  }
+}
+
+/* позиция карточки фолбэка: доли свободного места (десктоп --x/--y, мобильный --mx/--my) */
+.nx-fcard {
+  left: calc((100% - var(--cw)) * var(--x, 0));
+  top: calc((100% - var(--ch)) * var(--y, 0));
+}
+@media (max-width: 760px) {
+  .nx-fcard {
+    left: calc((100% - var(--cw)) * var(--mx, var(--x, 0)));
+    top: calc((100% - var(--ch)) * var(--my, var(--y, 0)));
   }
 }

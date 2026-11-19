@@ -20,7 +20,7 @@ export function Preloader() {
 
 /** Выполняется в <head> до первого paint. sessionStorage — «один раз за сессию». */
 export const preloaderScript = `(function(){try{
-var d=document.documentElement,q=location.search.indexOf('nopre')>-1,
+var d=document.documentElement;d.setAttribute('data-js','');var q=location.search.indexOf('nopre')>-1,
 r=matchMedia('(prefers-reduced-motion: reduce)').matches,k='nx-pre-seen';
 if(q||r||sessionStorage.getItem(k))return;
 sessionStorage.setItem(k,'1');d.setAttribute('data-pre','');

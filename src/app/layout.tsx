@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Unbounded } from 'next/font/google';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { MotionProvider } from '@/components/layout/MotionProvider';
 import { Preloader, preloaderScript } from '@/components/layout/Preloader';
 import { SmoothScroll } from '@/components/layout/SmoothScroll';
 import { StoreHydrator } from '@/components/layout/StoreHydrator';
@@ -50,12 +49,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         >
           К содержимому
         </a>
-        <MotionProvider>
-          <Header />
-          {children}
-          <Footer />
-          <Toaster />
-        </MotionProvider>
+        <Header />
+        {children}
+        <Footer />
+        <Toaster />
         <StoreHydrator />
         <SmoothScroll />
         <Preloader />

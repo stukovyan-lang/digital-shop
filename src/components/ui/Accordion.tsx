@@ -32,11 +32,14 @@ export function Accordion({ items, className }: { items: AccordionItem[]; classN
                 +
               </span>
             </button>
-            {isOpen && (
-              <div id={panel} role="region" className="nx-acc-body px-5 pb-5 text-muted">
-                {it.a}
-              </div>
-            )}
+            <div
+              id={panel}
+              role="region"
+              hidden={!isOpen}
+              className={cn('px-5 pb-5 text-muted', isOpen && 'nx-acc-body')}
+            >
+              {it.a}
+            </div>
           </div>
         );
       })}

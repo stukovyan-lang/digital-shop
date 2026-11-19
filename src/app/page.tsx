@@ -1,80 +1,61 @@
-'use client';
+import { Catalog } from '@/components/home/Catalog';
+import { FaqTeaser } from '@/components/home/FaqTeaser';
+import { Hero } from '@/components/home/Hero';
+import { Marquee } from '@/components/home/Marquee';
+import { Stats } from '@/components/home/Stats';
+import { Steps } from '@/components/home/Steps';
+import { TelegramBlock } from '@/components/home/TelegramBlock';
+import { Reveal } from '@/components/ui/Reveal';
+import type { ReactNode } from 'react';
 
-import { useState } from 'react';
-import { Accordion } from '@/components/ui/Accordion';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Chip, Option } from '@/components/ui/Chip';
-import { GradientText } from '@/components/ui/GradientText';
-import { Glass } from '@/components/ui/Glass';
-import { Input } from '@/components/ui/Input';
-import { LogoTile } from '@/components/ui/LogoTile';
-import { NeonCard } from '@/components/ui/NeonCard';
-import { PH } from '@/config/placeholders';
-import { toast } from '@/store/ui';
+const wrap = 'mx-auto max-w-[1240px] px-4 sm:px-6';
 
-/** ВРЕМЕННО: витрина UI-кита для проверки шага 2. Заменяется главной на шаге 4. */
-export default function Home() {
-  const [chip, setChip] = useState('all');
-  const [opt, setOpt] = useState('a');
+function Section({ id, title, children }: { id?: string; title: string; children: ReactNode }) {
   return (
-    <div className="mx-auto max-w-[1240px] px-4 py-12 sm:px-6">
-      <h1 className="nx-display text-4xl font-extrabold sm:text-5xl">
-        Пополняй и подписывайся <GradientText>со скоростью света</GradientText>
-      </h1>
-      <p className="mt-4 max-w-xl text-muted">UI-кит · {PH.NAME}</p>
+    <section
+      id={id}
+      className={`${wrap} mt-20 scroll-mt-24 sm:mt-28`}
+      aria-labelledby={`${id ?? title}-h`}
+    >
+      <Reveal>
+        <h2 id={`${id ?? title}-h`} className="nx-display mb-8 text-2xl font-extrabold sm:text-4xl">
+          {title}
+        </h2>
+        {children}
+      </Reveal>
+    </section>
+  );
+}
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Button>Открыть каталог</Button>
-        <Button variant="ghost">Telegram-бот</Button>
-        <Button onClick={() => toast('Текст скопирован')}>Тост</Button>
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <Marquee />
+      <section
+        id="catalog"
+        className={`${wrap} mt-16 scroll-mt-24 sm:mt-24`}
+        aria-labelledby="catalog-h"
+      >
+        <h2 id="catalog-h" className="nx-display mb-8 text-2xl font-extrabold sm:text-4xl">
+          Каталог
+        </h2>
+        <Catalog />
+      </section>
+      <Section id="steps" title="Три шага">
+        <Steps />
+      </Section>
+      <Section id="trust" title="Цифры и отзывы">
+        <Stats />
+      </Section>
+      <Section id="faq" title="Частые вопросы">
+        <FaqTeaser />
+      </Section>
+      <div className={`${wrap} mt-20 sm:mt-28`}>
+        <Reveal>
+          <TelegramBlock />
+        </Reveal>
       </div>
-
-      <div className="mt-8 flex flex-wrap gap-2">
-        {['all', 'telegram', 'games'].map((c) => (
-          <Chip key={c} on={chip === c} onClick={() => setChip(c)}>
-            {c}
-          </Chip>
-        ))}
-      </div>
-
-      <div className="mt-8 grid max-w-md grid-cols-2 gap-3">
-        {['a', 'b'].map((o) => (
-          <Option key={o} on={opt === o} onClick={() => setOpt(o)}>
-            {PH.PRICE}
-          </Option>
-        ))}
-      </div>
-
-      <div className="mt-8 grid gap-6 md:grid-cols-3">
-        <NeonCard className="p-6">
-          <LogoTile name="Telegram Stars" />
-          <div className="nx-display mt-4 text-lg font-bold">Telegram Stars</div>
-          <Badge delivery="auto" className="mt-3" />
-        </NeonCard>
-        <NeonCard className="p-6">
-          <LogoTile name="PS Plus" />
-          <div className="nx-display mt-4 text-lg font-bold">PS Plus Турция</div>
-          <Badge delivery="manual" className="mt-3" />
-        </NeonCard>
-        <NeonCard className="p-6">
-          <LogoTile name="Steam Region" />
-          <div className="nx-display mt-4 text-lg font-bold">Смена региона Steam</div>
-          <Badge delivery="pending" className="mt-3" />
-        </NeonCard>
-      </div>
-
-      <Glass className="mt-8 max-w-md p-6">
-        <Input label="Логин Steam" placeholder="login" hint="Подсказка" />
-      </Glass>
-
-      <Accordion
-        className="mt-8 max-w-2xl"
-        items={[
-          { id: '1', q: 'Вопрос 1', a: 'Ответ-заглушка.' },
-          { id: '2', q: 'Вопрос 2', a: 'Ответ-заглушка.' },
-        ]}
-      />
-    </div>
+    </>
   );
 }
