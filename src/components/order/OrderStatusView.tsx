@@ -146,7 +146,7 @@ export function OrderStatusView({ id }: { id: string }) {
                   const d = describeItem(item);
                   return (
                     <li key={item.id} className="flex items-center gap-4">
-                      <LogoTile name={d.name} size={44} />
+                      <LogoTile name={d.name} slug={d.product?.slug} size={44} />
                       <div className="min-w-0 flex-1">
                         <div className="font-semibold">{d.name}</div>
                         <div className="truncate text-sm text-muted">

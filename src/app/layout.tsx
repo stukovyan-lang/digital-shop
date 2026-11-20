@@ -3,7 +3,6 @@ import { Inter, Unbounded } from 'next/font/google';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { Preloader, preloaderScript } from '@/components/layout/Preloader';
-import { SmoothScroll } from '@/components/layout/SmoothScroll';
 import { StoreHydrator } from '@/components/layout/StoreHydrator';
 import { Toaster } from '@/components/ui/Toaster';
 import { site } from '@/config/site';
@@ -62,7 +61,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <Footer />
         <Toaster />
         <StoreHydrator />
-        <SmoothScroll />
         <Preloader />
       </body>
     </html>

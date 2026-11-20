@@ -101,7 +101,7 @@ export function ProductView({ product }: { product: Product }) {
           <Glass className="p-6 sm:p-8">
             <div className="flex flex-wrap items-center gap-5">
               <ViewTransition name={`logo-${product.slug}`} share="morph" default="none">
-                <LogoTile name={product.name} size={88} />
+                <LogoTile name={product.name} slug={product.slug} size={88} />
               </ViewTransition>
               <div className="min-w-0">
                 <Badge delivery={product.delivery} />

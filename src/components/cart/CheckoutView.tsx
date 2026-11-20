@@ -71,7 +71,7 @@ export function CheckoutView() {
                 const d = describeItem(item);
                 return (
                   <li key={item.id} className="nx-glass flex items-center gap-4 rounded-nx-18 p-4">
-                    <LogoTile name={d.name} size={52} />
+                    <LogoTile name={d.name} slug={d.product?.slug} size={52} />
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold">{d.name}</div>
                       <div className="truncate text-sm text-muted">

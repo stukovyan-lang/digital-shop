@@ -265,7 +265,7 @@ export function HeroStage() {
                     } as React.CSSProperties
                   }
                 >
-                  <LogoTile name={p.name} size={52} />
+                  <LogoTile name={p.name} slug={p.slug} size={52} />
                   <div>
                     <div className="nx-display text-base leading-tight font-bold">{p.name}</div>
                     <div className="mt-1 text-xs text-muted">

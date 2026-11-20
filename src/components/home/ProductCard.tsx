@@ -12,7 +12,7 @@ export function ProductCard({ product: p }: { product: Product }) {
       <div className="flex h-full flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-3">
           <ViewTransition name={`logo-${p.slug}`} share="morph" default="none">
-            <LogoTile name={p.name} />
+            <LogoTile name={p.name} slug={p.slug} />
           </ViewTransition>
           <Badge delivery={p.delivery} />
         </div>

@@ -471,6 +471,11 @@
     font-weight: 700;
     color: #fff;
   }
+  .nx-logo-brand {
+    background: #f4f2ff;
+    border: 0;
+    box-shadow: 0 0 24px rgba(255, 46, 136, 0.22);
+  }
 
   /* badges */
   .nx-badge {
