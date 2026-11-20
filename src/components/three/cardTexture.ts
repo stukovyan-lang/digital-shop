@@ -1,4 +1,5 @@
 import { CanvasTexture, SRGBColorSpace } from 'three';
+import { brands } from '@/data/brands';
 
 const family = (v: string, fallback: string) => {
   const raw = getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -32,7 +33,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
  * Лицо карточки: плитка с инициалами (как .nx-logo), название и «от [ЦЕНА]».
  * Рисуем 2D-canvas'ом — шрифты Unbounded/Inter уже загружены страницей, сеть не нужна.
  */
-export async function makeCardTexture(name: string, priceText: string, glow: string) {
+export async function makeCardTexture(slug: string, name: string, priceText: string, glow: string) {
   const display = family('--font-unbounded', 'sans-serif');
   const sans = family('--font-inter', 'sans-serif');
   try {
@@ -61,20 +62,33 @@ export async function makeCardTexture(name: string, priceText: string, glow: str
   ctx.globalAlpha = 1;
   ctx.strokeStyle = 'rgba(255,255,255,0.3)';
 
-  // плитка логотипа
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.lineWidth = 3;
-  ctx.setLineDash([10, 8]);
+  // плитка логотипа: знак бренда на светлой плитке или инициалы
+  const brand = brands[slug];
   ctx.beginPath();
   ctx.roundRect(48, 52, 136, 136, 34);
-  ctx.fill();
-  ctx.stroke();
-  ctx.setLineDash([]);
+  if (brand) {
+    ctx.fillStyle = '#F4F2FF';
+    ctx.fill();
+    ctx.save();
+    ctx.translate(48 + 68 - 41, 52 + 68 - 41);
+    ctx.scale(82 / 24, 82 / 24);
+    ctx.fillStyle = brand.color;
+    ctx.fill(new Path2D(brand.path));
+    ctx.restore();
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 8]);
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 54px ${display}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials(name), 116, 124);
+  }
   ctx.fillStyle = '#fff';
-  ctx.font = `700 54px ${display}`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(initials(name), 116, 124);
 
   // название
   ctx.textAlign = 'left';

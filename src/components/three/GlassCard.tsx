@@ -9,6 +9,7 @@ import { makeCardTexture } from './cardTexture';
 export type SceneQuality = 'high' | 'medium';
 
 type Props = {
+  slug: string;
   name: string;
   priceText: string;
   glow: string;
@@ -24,6 +25,7 @@ const H = 2.0;
 
 /** Стеклянная карточка сервиса: MeshPhysicalMaterial (transmission + iridescence) и лицо из canvas-текстуры. */
 export function GlassCard({
+  slug,
   name,
   priceText,
   glow,
@@ -41,7 +43,7 @@ export function GlassCard({
   useEffect(() => {
     let cancelled = false;
     let made: Texture | null = null;
-    void makeCardTexture(name, priceText, glow).then((t) => {
+    void makeCardTexture(slug, name, priceText, glow).then((t) => {
       if (cancelled) t.dispose();
       else {
         made = t;
@@ -52,7 +54,7 @@ export function GlassCard({
       cancelled = true;
       made?.dispose();
     };
-  }, [name, priceText, glow]);
+  }, [slug, name, priceText, glow]);
 
   // плавный hover-подъём
   useFrame((_, dt) => {

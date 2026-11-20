@@ -1,18 +1,18 @@
 import { LogoTile } from '@/components/ui/LogoTile';
 import { products } from '@/data/products';
 
-const names = Array.from(new Set(products.map((p) => p.name)));
+const items = products.map((p) => ({ slug: p.slug, name: p.name }));
 
 function Row({ hidden }: { hidden?: boolean }) {
   return (
     <div className="flex gap-[18px]" aria-hidden={hidden || undefined}>
-      {names.map((n) => (
+      {items.map((n) => (
         <div
-          key={n}
+          key={n.slug}
           className="nx-glass flex min-h-14 shrink-0 items-center gap-3 rounded-nx-18 py-2 pr-5 pl-2"
         >
-          <LogoTile name={n} size={40} />
-          <span className="text-sm font-semibold whitespace-nowrap">{n}</span>
+          <LogoTile name={n.name} slug={n.slug} size={40} />
+          <span className="text-sm font-semibold whitespace-nowrap">{n.name}</span>
         </div>
       ))}
     </div>

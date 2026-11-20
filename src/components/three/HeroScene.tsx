@@ -68,6 +68,7 @@ function Rig({
       {visible.map((c, i) => (
         <GlassCard
           key={c.slug}
+          slug={c.slug}
           name={c.name}
           priceText={c.priceText}
           glow={c.glow}
